@@ -74,3 +74,7 @@ def trim_middle(text):
         if curr_tokens > half_point * 3:
             break
     return " ".join(sentences)
+
+
+def max_tokens_for_self_extend(original_context, n, w):
+    return n * original_context - w * (n - 1)
