@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import argparse
 from summarizer.summarizer import get_text, trim_text
 
 context = 2048
@@ -15,8 +16,17 @@ top_p = 1.0
 repeat_penalty = 1.0
 min_p = 0
 
+parser = argparse.ArgumentParser(
+    prog="cli-summarizer",
+    description="Summarizes a URL",
+    epilog="Text at the bottom of help",
+)
+parser.add_argument("url", help="URL to summarize")
+parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
+parser.add_argument("--no-display-prompt", action="store_true", help="Hide prompt")
+args = parser.parse_args()
 
-url = sys.argv[1]
+url = args.url
 text = get_text(url)
 text, noof_tokens = trim_text(text)
 
@@ -39,37 +49,47 @@ if noof_tokens > 2048:
 
 import subprocess
 
-subprocess.run(
-    [
-        "/Users/thomastay/llama.cpp/main",
-        "-m",
-        model_path,
-        "-c",
-        str(scale_ctx * context),
-        "-n",
-        "300",
-        "--n-gpu-layers",
-        "99",
-        # Tunable parameters
-        "--temp",
-        str(temperature),
-        "--top-k",
-        str(top_k),
-        "--top-p",
-        str(top_p),
-        "--repeat-penalty",
-        str(repeat_penalty),
-        "--min-p",
-        str(min_p),
-        "--grp-attn-n",
-        str(group_attention_n),
-        "--grp-attn-w",
-        str(group_attention_width),
-        # prompt
-        "--prompt",
-        prompt,
-    ],
-)
+subprocess_args = [
+    "/Users/thomastay/llama.cpp/main",
+    "-m",
+    model_path,
+    "-c",
+    str(scale_ctx * context),
+    "-n",
+    "300",
+    "--n-gpu-layers",
+    "99",
+    # Tunable parameters
+    "--temp",
+    str(temperature),
+    "--top-k",
+    str(top_k),
+    "--top-p",
+    str(top_p),
+    "--repeat-penalty",
+    str(repeat_penalty),
+    "--min-p",
+    str(min_p),
+    "--grp-attn-n",
+    str(group_attention_n),
+    "--grp-attn-w",
+    str(group_attention_width),
+    # prompt
+    "--prompt",
+    prompt,
+]
+if args.no_display_prompt:
+    subprocess_args.append("--no-display-prompt")
+
+if args.verbose:
+    subprocess.run(subprocess_args)
+else:
+    subprocess.run(
+        subprocess_args,
+        # Ignore stderr
+        stderr=subprocess.DEVNULL,
+    )
+
 
 # from llama_cpp import Llama
 # llm = Llama(
