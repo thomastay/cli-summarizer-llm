@@ -31,13 +31,19 @@ args = parser.parse_args()
 
 # calculated offline
 prompt_size = 160
-prompt_processing_speed = 100  # tokens per second
+prompt_processing_speed = 80  # tokens per second
+token_generation_speed = 15  # tokens per second
 url = args.url
 text = get_text(url)
 trim_count = max_scale_context * model_context - num_out - prompt_size  # About 3700
 text, noof_tokens = trim_text(text, trim_count)
+eta = round(noof_tokens / prompt_processing_speed + num_out / token_generation_speed)
 print(
-    "Num tokens:", noof_tokens, "eta:", noof_tokens / prompt_processing_speed, "seconds"
+    "Num tokens:",
+    noof_tokens,
+    "eta:",
+    eta,
+    "seconds",
 )
 # For debugging middle
 # middle = trim_middle(text)
@@ -119,7 +125,7 @@ else:
         # Ignore stderr
         stderr=subprocess.DEVNULL,
     )
-print("Time taken:", time() - curr_time)
+print("\nTime taken:", round(time() - curr_time), "seconds")
 
 
 # from llama_cpp import Llama
