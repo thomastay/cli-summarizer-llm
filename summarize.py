@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import sys
-from llama_cpp import Llama
-from .summarizer import get_text, trim_text
+from summarizer.summarizer import get_text, trim_text
 
 context = 2048
 
@@ -72,6 +71,7 @@ subprocess.run(
     ],
 )
 
+# from llama_cpp import Llama
 # llm = Llama(
 #     model_path=model_path,
 #     n_ctx=context,
