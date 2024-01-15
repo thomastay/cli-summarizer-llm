@@ -54,3 +54,23 @@ def trim_text(text, max_tokens=3700):
         f"({round(curr_tokens / total_tokens * 100)}%)",
     )
     return return_text, curr_tokens
+
+
+def trim_middle(text):
+    total_tokens = num_tokens(text)
+    all_sentences = [sent.text for sent in nlp(text).sents]
+    all_sentences_token_count = [
+        len(x) for x in tokenizer(all_sentences, verbose=False)["input_ids"]
+    ]
+
+    # Accumulate sentences from the middle quarter
+    half_point = total_tokens // 4
+    curr_tokens = 0
+    sentences = []
+    for i, sentence in enumerate(all_sentences):
+        curr_tokens += all_sentences_token_count[i]
+        if curr_tokens > half_point:
+            sentences.append(sentence)
+        if curr_tokens > half_point * 3:
+            break
+    return " ".join(sentences)

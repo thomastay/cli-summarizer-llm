@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import argparse
-from summarizer.summarizer import get_text, trim_text
+from summarizer.summarizer import get_text, trim_text, trim_middle
 
 # Model specific details
 model_path = (
@@ -38,13 +38,16 @@ text, noof_tokens = trim_text(text)
 print(
     "Num tokens:", noof_tokens, "eta:", noof_tokens / prompt_processing_speed, "seconds"
 )
+# For debugging middle
+# middle = trim_middle(text)
+# print(middle)
 
 # Extending context
 group_attention_width = model_context
 group_attention_n = 1
 scale_ctx = 1
 if noof_tokens > model_context:
-    group_attention_width = model_context // 4
+    group_attention_width = model_context // 2
     group_attention_n = 4
     scale_ctx = 2
 
