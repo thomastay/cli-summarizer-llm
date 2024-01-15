@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 import argparse
 from summarizer.summarizer import get_text, trim_text, max_tokens_for_self_extend
+from time import time
 
 # Model specific details
 model_path = (
     "/Users/thomastay/text-generation-webui/models/dolphin-2_6-phi-2.Q4_K_M.gguf"
 )
 model_context = 2048
-max_scale_context = 2
+max_scale_context = 4
 
 
 # Tunable output parameters
@@ -47,9 +48,16 @@ group_attention_width = model_context
 group_attention_n = 1
 scale_ctx = 1
 if noof_tokens > model_context:
-    group_attention_width = model_context // 2
-    group_attention_n = 4
-    scale_ctx = 2
+    if noof_tokens < model_context * 2:
+        group_attention_width = model_context // 2
+        group_attention_n = 4
+        scale_ctx = 2
+    elif noof_tokens < model_context * 4:
+        group_attention_width = model_context // 2
+        group_attention_n = 8
+        scale_ctx = 4
+    else:
+        raise Exception("Too many tokens to extend context")
 
 # Double check that everything is alright
 max_tokens_extension = max_tokens_for_self_extend(
@@ -101,6 +109,8 @@ subprocess_args = [
 if not args.display_prompt:
     subprocess_args.append("--no-display-prompt")
 
+curr_time = time()
+
 if args.verbose:
     subprocess.run(subprocess_args)
 else:
@@ -109,6 +119,7 @@ else:
         # Ignore stderr
         stderr=subprocess.DEVNULL,
     )
+print("Time taken:", time() - curr_time)
 
 
 # from llama_cpp import Llama
