@@ -40,7 +40,7 @@ def trim_text(text, max_tokens=3700):
     sentences_end = []
     for i, sentence in enumerate(reversed(all_sentences)):
         curr_tokens += all_sentences_token_count[-i - 1]
-        if curr_tokens > 3700:
+        if curr_tokens > max_tokens:
             curr_tokens -= all_sentences_token_count[-i - 1]
             break
         sentences_end.append(sentence)
