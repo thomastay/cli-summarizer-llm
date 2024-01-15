@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 import argparse
-from summarizer.summarizer import get_text, trim_text, max_tokens_for_self_extend
+from summarizer.summarizer import (
+    get_text,
+    trim_text,
+    max_tokens_for_self_extend,
+    trim_middle,
+)
 from time import time
 
 # Model specific details
@@ -27,6 +32,9 @@ parser = argparse.ArgumentParser(
 parser.add_argument("url", help="URL to summarize")
 parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 parser.add_argument("--display-prompt", action="store_true", help="Hide prompt")
+parser.add_argument(
+    "--display-middle", action="store_true", help="Show the middle half of the essay"
+)
 args = parser.parse_args()
 
 # calculated offline
@@ -46,8 +54,9 @@ print(
     "seconds",
 )
 # For debugging middle
-# middle = trim_middle(text)
-# print(middle)
+if args.display_middle:
+    middle = trim_middle(text)
+    print(middle)
 
 # Extending context
 group_attention_width = model_context
