@@ -21,7 +21,7 @@ def num_tokens(text):
 
 def trim_text(text):
     total_tokens = num_tokens(text)
-    if total_tokens < 1700:
+    if total_tokens < 3700:
         return text
 
     all_sentences = [sent.text for sent in nlp(text).sents]
@@ -34,7 +34,7 @@ def trim_text(text):
     sentences = []
     for i, sentence in enumerate(all_sentences):
         curr_tokens += all_sentences_token_count[i]
-        if curr_tokens > 850:
+        if curr_tokens > 1850:
             curr_tokens -= all_sentences_token_count[i]
             break
         sentences.append(sentence)
@@ -42,7 +42,7 @@ def trim_text(text):
     sentences_end = []
     for i, sentence in enumerate(reversed(all_sentences)):
         curr_tokens += all_sentences_token_count[-i - 1]
-        if curr_tokens > 1700:
+        if curr_tokens > 3700:
             curr_tokens -= all_sentences_token_count[-i - 1]
             break
         sentences_end.append(sentence)
@@ -77,15 +77,16 @@ model_path = (
 context = 2048
 
 # Tunable output parameters
-temperature = 0.1
+temperature = 1.0
 top_k = 4
 top_p = 1.0
 repeat_penalty = 1.0
 min_p = 0
 
 # Extending context
-group_attention_width = 2048
-group_attention_n = 2
+group_attention_width = 1024
+group_attention_n = 8
+scale_ctx = 4
 
 
 import subprocess
@@ -96,7 +97,7 @@ subprocess.run(
         "-m",
         model_path,
         "-c",
-        str(group_attention_n * context),
+        str(scale_ctx * context),
         "-n",
         "300",
         "--n-gpu-layers",
