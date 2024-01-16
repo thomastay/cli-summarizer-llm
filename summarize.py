@@ -6,7 +6,7 @@ from summarizer.summarizer import (
     extend_context_args,
     trim_middle,
 )
-from summarizer.prompt import create_prompt, topic_prompt
+from summarizer.prompt import summary_prompt, topic_prompt, topic_params, summary_params
 from time import time
 
 # Model specific details
@@ -15,15 +15,6 @@ model_path = (
 )
 model_context = 2048
 max_scale_context = 4
-
-
-# Tunable output parameters
-num_out = 300
-temperature = 1.0
-top_k = 4
-top_p = 1.0
-repeat_penalty = 1.0
-min_p = 0
 
 parser = argparse.ArgumentParser(
     prog="cli-summarizer",
@@ -50,15 +41,25 @@ parser.add_argument("--prompt-type", help="Prompt type")
 
 args = parser.parse_args()
 
+if args.prompt_type == "topic":
+    prompt_params = topic_params
+else:
+    prompt_params = summary_params
+
 # calculated offline
 prompt_size = 160
 prompt_processing_speed = 80  # tokens per second
 token_generation_speed = 15  # tokens per second
 url = args.url
 text = get_text(url, args)
-trim_count = max_scale_context * model_context - num_out - prompt_size  # About 3700
+trim_count = (
+    max_scale_context * model_context - prompt_params["num_out"] - prompt_size
+)  # About 3700
 text, noof_tokens = trim_text(text, trim_count)
-eta = round(noof_tokens / prompt_processing_speed + num_out / token_generation_speed)
+eta = round(
+    noof_tokens / prompt_processing_speed
+    + prompt_params["num_out"] / token_generation_speed
+)
 print(
     "Num tokens:",
     noof_tokens,
@@ -78,7 +79,7 @@ group_attention_width, group_attention_n, scale_ctx = extend_context_args(
 if args.prompt_type == "topic":
     prompt = topic_prompt(text)
 else:
-    prompt = create_prompt(text)
+    prompt = summary_prompt(text)
 
 import subprocess
 
@@ -89,20 +90,20 @@ subprocess_args = [
     "-c",
     str(scale_ctx * model_context),
     "-n",
-    "300",
+    str(prompt_params["num_out"]),
     "--n-gpu-layers",
     "99",
     # Tunable parameters
     "--temp",
-    str(temperature),
+    str(prompt_params["temperature"]),
     "--top-k",
-    str(top_k),
+    str(prompt_params["top_k"]),
     "--top-p",
-    str(top_p),
+    str(prompt_params["top_p"]),
     "--repeat-penalty",
-    str(repeat_penalty),
+    str(prompt_params["repeat_penalty"]),
     "--min-p",
-    str(min_p),
+    str(prompt_params["min_p"]),
     "--grp-attn-n",
     str(group_attention_n),
     "--grp-attn-w",
@@ -111,6 +112,21 @@ subprocess_args = [
     "--prompt",
     prompt,
 ]
+if "typical_p" in prompt_params:
+    subprocess_args.extend(
+        [
+            "--typical",
+            str(prompt_params["typical_p"]),
+        ]
+    )
+if "tfs" in prompt_params:
+    subprocess_args.extend(
+        [
+            "--tfs",
+            str(prompt_params["tfs"]),
+        ]
+    )
+
 if not args.display_prompt:
     subprocess_args.append("--no-display-prompt")
 
