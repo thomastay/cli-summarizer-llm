@@ -37,11 +37,11 @@ parser.add_argument(
     action="store_true",
     help="Include tables in the prompt (usually not helpful for summaries)",
 )
-parser.add_argument("--prompt-type", help="Prompt type")
+parser.add_argument("--type", help="Prompt type")
 
 args = parser.parse_args()
 
-if args.prompt_type == "topic":
+if args.type == "topic":
     prompt_params = topic_params
 else:
     prompt_params = summary_params
@@ -76,7 +76,7 @@ group_attention_width, group_attention_n, scale_ctx = extend_context_args(
     model_context, noof_tokens
 )
 
-if args.prompt_type == "topic":
+if args.type == "topic":
     prompt = topic_prompt(text)
 else:
     prompt = summary_prompt(text)
