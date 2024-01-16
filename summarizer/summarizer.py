@@ -7,9 +7,18 @@ tokenizer = AutoTokenizer.from_pretrained("microsoft/phi-2")
 nlp = spacy.load("en_core_web_sm")
 
 
-def get_text(url):
+def get_text(url, args):
     downloaded = trafilatura.fetch_url(url)
-    return trafilatura.extract(downloaded)
+    prune_xpath = ["//code", "//pre"]
+    if args.include_code:
+        prune_xpath = None
+    include_tables = args.include_tables
+
+    return trafilatura.extract(
+        downloaded,
+        prune_xpath=prune_xpath,
+        include_tables=include_tables,
+    )
 
 
 def num_tokens(text):
