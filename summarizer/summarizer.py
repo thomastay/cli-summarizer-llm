@@ -87,3 +87,31 @@ def trim_middle(text):
 
 def max_tokens_for_self_extend(original_context, n, w):
     return n * original_context - w * (n - 1)
+
+
+def extend_context_args(model_context, noof_tokens):
+    # Extending context
+    group_attention_width = model_context
+    group_attention_n = 1
+    scale_ctx = 1
+    if noof_tokens > model_context:
+        if noof_tokens < model_context * 2:
+            group_attention_width = model_context // 2
+            group_attention_n = 4
+            scale_ctx = 2
+        elif noof_tokens < model_context * 4:
+            group_attention_width = model_context // 2
+            group_attention_n = 8
+            scale_ctx = 4
+        else:
+            raise Exception("Too many tokens to extend context")
+
+    # Double check that everything is alright
+    max_tokens_extension = max_tokens_for_self_extend(
+        model_context,
+        group_attention_n,
+        group_attention_width,
+    )
+    assert (scale_ctx * model_context) <= max_tokens_extension
+
+    return group_attention_width, group_attention_n, scale_ctx
