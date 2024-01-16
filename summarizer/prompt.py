@@ -17,13 +17,5 @@ def create_prompt(text):
 
 def topic_prompt(text):
     # Experiment (not yet successful)
-    instruction = (
-        f"In a numbered list, write the top 3-5 topics of the previous text. Given the list of topics, write a summary of the previous text in one or two paragraphs which includes the topics.\n"
-        f"\nExample Output:\n'''\n"
-        f"1. Challenges faced in fine-tuning the model and learning about potential pitfalls and mistakes.\n"
-        f"2. The importance of the prompt and how it can be used to control the model.\n\n"
-        f"Summary:\n"
-        f"The text discusses the author's experience with using an OpenAI language model to fine-tune the Connections word game and the process of creating and training a dataset for this purpose. It also highlights the challenges faced during the fine-tuning process and the evaluation of the model's performance. The author shares their thoughts on the project and their future plans to explore further possibilities.\n"
-        f"'''"
-    )
+    instruction = f"In a numbered list, write the top 3-5 topics of the previous text. Each topic should be a single sentence.\n"
     return create_prompt_base(text, instruction)
