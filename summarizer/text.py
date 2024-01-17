@@ -1,10 +1,18 @@
 import trafilatura
 from transformers import AutoTokenizer, logging
 import spacy
+from .timing import timing
 
 logging.set_verbosity_error()  # disable the "Special tokens..." warning message
 tokenizer = AutoTokenizer.from_pretrained("microsoft/phi-2")
 nlp = spacy.load("en_core_web_sm")
+
+
+@timing
+def fetch_and_trim_text(url, args, trim_count):
+    text = get_text(url, args)
+    text, noof_tokens = trim_text(text, trim_count)
+    return text, noof_tokens
 
 
 def get_text(url, args):

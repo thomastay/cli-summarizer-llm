@@ -2,8 +2,7 @@
 import argparse
 import os
 from summarizer.text import (
-    get_text,
-    trim_text,
+    fetch_and_trim_text,
     extend_context_args,
     trim_middle,
 )
@@ -66,23 +65,17 @@ else:
 # calculated offline
 prompt_size = 160
 url = args.url
-text = get_text(url, args)
 trim_count = (
     max_scale_context * model_context - prompt_params["num_out"] - prompt_size
 )  # About 3700
-text, noof_tokens = trim_text(text, trim_count)
+text, noof_tokens = fetch_and_trim_text(url, args, trim_count)
 noof_tokens += prompt_size + prompt_params["num_out"]
-eta = round(
+eta = (
     noof_tokens / prompt_processing_speed
     + prompt_params["num_out"] / token_generation_speed
 )
-print(
-    "Num tokens:",
-    noof_tokens,
-    "eta:",
-    eta,
-    "seconds",
-)
+
+print(f"Num tokens: {noof_tokens} eta: {eta:.2f} seconds")
 # For debugging middle
 if args.display_middle:
     middle = trim_middle(text)

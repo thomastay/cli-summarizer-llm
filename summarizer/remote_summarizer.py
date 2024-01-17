@@ -63,7 +63,7 @@ def summarize_openrouter(
     data = response.json()
     try:
         summary = data["choices"][0]["message"]["content"]
-        print(summary)
+        print(summary, end="\n\n")
     except:
         with open("cli-summarizer-llm-response.json", "w") as f:
             json.dump(data, f, indent=4)
