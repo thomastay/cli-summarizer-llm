@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 import argparse
-from summarizer.summarizer import (
+from summarizer.text import (
     get_text,
     trim_text,
     extend_context_args,
     trim_middle,
 )
 from summarizer.prompt import summary_prompt, topic_prompt, topic_params, summary_params
+from summarizer.local_summarizer import summarize_local
 from time import time
 
 # Model specific details
@@ -56,6 +57,7 @@ trim_count = (
     max_scale_context * model_context - prompt_params["num_out"] - prompt_size
 )  # About 3700
 text, noof_tokens = trim_text(text, trim_count)
+noof_tokens += prompt_size + prompt_params["num_out"]
 eta = round(
     noof_tokens / prompt_processing_speed
     + prompt_params["num_out"] / token_generation_speed
@@ -81,90 +83,13 @@ if args.type == "topic":
 else:
     prompt = summary_prompt(text)
 
-import subprocess
+local_args = {
+    "llama_cpp_path": "/Users/thomastay/llama.cpp",
+    "model_path": model_path,
+    "scale_ctx": scale_ctx,
+    "model_context": model_context,
+    "group_attention_width": group_attention_width,
+    "group_attention_n": group_attention_n,
+}
 
-subprocess_args = [
-    "/Users/thomastay/llama.cpp/main",
-    "-m",
-    model_path,
-    "-c",
-    str(scale_ctx * model_context),
-    "-n",
-    str(prompt_params["num_out"]),
-    "--n-gpu-layers",
-    "99",
-    # Tunable parameters
-    "--temp",
-    str(prompt_params["temperature"]),
-    "--top-k",
-    str(prompt_params["top_k"]),
-    "--top-p",
-    str(prompt_params["top_p"]),
-    "--repeat-penalty",
-    str(prompt_params["repeat_penalty"]),
-    "--min-p",
-    str(prompt_params["min_p"]),
-    "--grp-attn-n",
-    str(group_attention_n),
-    "--grp-attn-w",
-    str(group_attention_width),
-    # prompt
-    "--prompt",
-    prompt,
-]
-if "typical_p" in prompt_params:
-    subprocess_args.extend(
-        [
-            "--typical",
-            str(prompt_params["typical_p"]),
-        ]
-    )
-if "tfs" in prompt_params:
-    subprocess_args.extend(
-        [
-            "--tfs",
-            str(prompt_params["tfs"]),
-        ]
-    )
-
-if not args.display_prompt:
-    subprocess_args.append("--no-display-prompt")
-
-curr_time = time()
-
-if args.verbose:
-    subprocess.run(subprocess_args)
-else:
-    subprocess.run(
-        subprocess_args,
-        # Ignore stderr
-        stderr=subprocess.DEVNULL,
-    )
-
-print("\nTime taken:", round(time() - curr_time), "seconds")
-
-
-# from llama_cpp import Llama
-# llm = Llama(
-#     model_path=model_path,
-#     n_ctx=context,
-#     n_gpu_layers=-1,
-#     verbose=False,
-# )
-# streaming = llm(
-#     prompt,
-#     max_tokens=300,
-#     echo=False,
-#     stream=True,
-#     stop=["<|im_end|>"],
-#     # TUNE THESE:
-#     temperature=1.0,
-#     top_k=4,
-#     top_p=1.0,
-#     repeat_penalty=1.0,
-#     min_p=0,
-# )
-# for output in streaming:
-#     # The output format is an open AI response format, so it looks like:
-#     # {'choices': [{'text': 'The summary of the text is:'}]}
-#     print(output["choices"][0]["text"], end="")
+summarize_local(prompt, args=args, local_args=local_args, prompt_params=prompt_params)
