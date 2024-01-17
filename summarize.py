@@ -48,8 +48,10 @@ if args.remote:
     model_name = "nousresearch/nous-capybara-7b"
     model_context = 4096
     max_scale_context = 1
-    prompt_processing_speed = 300  # tokens per second
-    token_generation_speed = 100  # tokens per second
+    prompt_processing_speed = (
+        10000  # tokens per second. R deems this not statistically significant, lol
+    )
+    token_generation_speed = 60  # tokens per second
 else:
     model_name = "dolphin-2_6-phi-2"
     model_path = (
