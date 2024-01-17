@@ -16,6 +16,13 @@ def summary_prompt(text):
     return create_prompt_base(text, instruction)
 
 
+def summary_prompt_remote(text):
+    # Returns the system and user prompt separately
+    instruction = "Summarize the previous text in one or two paragraphs."
+    user = f"{text}\n===\n{instruction}\n"
+    return dolphin_prompt, user
+
+
 def topic_prompt(text):
     instruction = f"In a numbered list, write the top 3-5 topics of the previous text. Each topic should be around 5 words.\n"
     return create_prompt_base(text, instruction, system_prompt=dolphin_topic_prompt)

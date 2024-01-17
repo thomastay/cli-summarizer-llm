@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import os
 from summarizer.text import (
     get_text,
     trim_text,
@@ -8,7 +9,7 @@ from summarizer.text import (
 )
 from summarizer.prompt import summary_prompt, topic_prompt, topic_params, summary_params
 from summarizer.local_summarizer import summarize_local
-from time import time
+from summarizer.remote_summarizer import summarize_openrouter
 
 # Model specific details
 model_path = (
@@ -39,6 +40,7 @@ parser.add_argument(
     help="Include tables in the prompt (usually not helpful for summaries)",
 )
 parser.add_argument("--type", help="Prompt type")
+parser.add_argument("--remote", action="store_true", help="Use remote summarizer")
 
 args = parser.parse_args()
 
@@ -83,13 +85,28 @@ if args.type == "topic":
 else:
     prompt = summary_prompt(text)
 
-local_args = {
-    "llama_cpp_path": "/Users/thomastay/llama.cpp",
-    "model_path": model_path,
-    "scale_ctx": scale_ctx,
-    "model_context": model_context,
-    "group_attention_width": group_attention_width,
-    "group_attention_n": group_attention_n,
-}
-
-summarize_local(prompt, args=args, local_args=local_args, prompt_params=prompt_params)
+if args.remote:
+    api_key = os.environ.get("OPEN_API_KEY")
+    summarize_openrouter(
+        text,
+        args,
+        remote_args={
+            "api_key": api_key,
+            "model_name": "nousresearch/nous-capybara-7b",  # it's free for now
+        },
+    )
+else:
+    local_args = {
+        "llama_cpp_path": "/Users/thomastay/llama.cpp",
+        "model_path": model_path,
+        "scale_ctx": scale_ctx,
+        "model_context": model_context,
+        "group_attention_width": group_attention_width,
+        "group_attention_n": group_attention_n,
+    }
+    summarize_local(
+        prompt,
+        args=args,
+        local_args=local_args,
+        prompt_params=prompt_params,
+    )
