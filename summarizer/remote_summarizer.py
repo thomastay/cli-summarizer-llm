@@ -4,7 +4,8 @@ import json
 from .prompt import summary_prompt_remote
 from .timing import timing
 
-title = "cli-summarizer-llm"
+repo_url = "https://github.com/thomastay/cli-summarizer-llm/"
+title = "Summarizer"
 
 
 @timing
@@ -40,6 +41,7 @@ def summarize_openrouter(
         url="https://openrouter.ai/api/v1/chat/completions",
         headers={
             "Authorization": f"Bearer {api_key}",
+            "HTTP-Referer": repo_url,
             "X-Title": title,
         },
         data=json.dumps(
