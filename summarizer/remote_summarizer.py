@@ -2,10 +2,12 @@ import requests
 import json
 
 from .prompt import summary_prompt_remote
+from .timing import timing
 
 title = "cli-summarizer-llm"
 
 
+@timing
 def summarize_openrouter(
     text,
     args,  # Args from command line
