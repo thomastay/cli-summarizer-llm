@@ -11,13 +11,6 @@ from summarizer.prompt import summary_prompt, topic_prompt, topic_params, summar
 from summarizer.local_summarizer import summarize_local
 from summarizer.remote_summarizer import summarize_openrouter
 
-# Model specific details
-model_path = (
-    "/Users/thomastay/text-generation-webui/models/dolphin-2_6-phi-2.Q4_K_M.gguf"
-)
-model_context = 2048
-max_scale_context = 4
-
 parser = argparse.ArgumentParser(
     prog="cli-summarizer",
     description="Summarizes a URL",
@@ -48,6 +41,21 @@ if args.type == "topic":
     prompt_params = topic_params
 else:
     prompt_params = summary_params
+
+# Model specific details
+if args.remote:
+    # TODO make this generic
+    model_name = "nousresearch/nous-capybara-7b"
+    model_context = 4096
+    max_scale_context = 1
+else:
+    model_name = "dolphin-2_6-phi-2"
+    model_path = (
+        "/Users/thomastay/text-generation-webui/models/dolphin-2_6-phi-2.Q4_K_M.gguf"
+    )
+    model_context = 2048
+    max_scale_context = 4
+
 
 # calculated offline
 prompt_size = 160
@@ -92,8 +100,9 @@ if args.remote:
         args,
         remote_args={
             "api_key": api_key,
-            "model_name": "nousresearch/nous-capybara-7b",  # it's free for now
+            "model_name": model_name,  # it's free for now
         },
+        prompt_params=prompt_params,
     )
 else:
     local_args = {
