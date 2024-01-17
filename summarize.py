@@ -48,6 +48,8 @@ if args.remote:
     model_name = "nousresearch/nous-capybara-7b"
     model_context = 4096
     max_scale_context = 1
+    prompt_processing_speed = 300  # tokens per second
+    token_generation_speed = 100  # tokens per second
 else:
     model_name = "dolphin-2_6-phi-2"
     model_path = (
@@ -55,12 +57,12 @@ else:
     )
     model_context = 2048
     max_scale_context = 4
+    prompt_processing_speed = 80  # tokens per second
+    token_generation_speed = 15  # tokens per second
 
 
 # calculated offline
 prompt_size = 160
-prompt_processing_speed = 80  # tokens per second
-token_generation_speed = 15  # tokens per second
 url = args.url
 text = get_text(url, args)
 trim_count = (
