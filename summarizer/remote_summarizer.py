@@ -1,7 +1,7 @@
 import requests
 import json
 
-from .prompt import summary_prompt_remote
+from .prompt import summary_prompt_remote, qa_prompt_remote
 from .timing import timing
 
 repo_url = "https://github.com/thomastay/cli-summarizer-llm/"
@@ -34,6 +34,8 @@ def summarize_openrouter(
     model_name = remote_args["model_name"]
     if args.type == "topic":
         raise NotImplementedError
+    elif args.type == "qa":
+        system, user = qa_prompt_remote(text)
     else:
         system, user = summary_prompt_remote(text)
 
