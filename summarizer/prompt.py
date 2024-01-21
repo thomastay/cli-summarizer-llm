@@ -31,6 +31,21 @@ def qa_prompt_remote(text):
     return system_prompt, user
 
 
+def bullet_prompt_remote(text):
+    # Returns the system and user prompt separately
+    system_prompt = "You are a journalist writing a bullet point summary of a news article. You specialise in summarizing relevant information in clear, captivating and concise bullet points."
+    instruction = (
+        f"Text format:\n"
+        f"Each sentence is surrounded by a message tag m with an id attribute.\n"
+        f'e.g. <m id=0>This is a sentence.</m> means that the sentence is "This is a sentence" and its id is 0\n'
+        f"The sentence ids are 0-indexed and arranged in order of the text.\n"
+        f"From the text, generate a list containing 3 highlights. Each highlight should be a single sentence and has 20 words or less. For each highlight, include one to four ids from the text that support the highlight, sorted by relevance to the highlight with most relevant first.\n"
+        f"Each highlight should be formatted as follows:\Highlight:Here is the highlight of the text.\nSupport: 1,5,13,14\n"
+    )
+    user = f"===\n# TEXT\n===\n" f"{text}\n===\n{instruction}\n"
+    return system_prompt, user
+
+
 def topic_prompt(text):
     instruction = f"In a numbered list, write the top 3-5 topics of the previous text. Each topic should be around 5 words.\n"
     return create_prompt_base(text, instruction, system_prompt=dolphin_topic_prompt)
@@ -44,6 +59,16 @@ topic_params = {
     "top_k": 20,
     "top_p": 0.9,
     "repeat_penalty": 1.15,
+    "min_p": 0,
+    # "tfs": 0.68,
+    # "typical_p": 0.68,
+}
+bullet_params = {
+    "num_out": 200,
+    "temperature": 0.3,
+    "top_k": 85,
+    "top_p": 0.99,
+    "repeat_penalty": 1.01,
     "min_p": 0,
     # "tfs": 0.68,
     # "typical_p": 0.68,

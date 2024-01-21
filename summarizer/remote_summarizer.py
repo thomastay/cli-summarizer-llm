@@ -1,7 +1,14 @@
 import requests
 import json
 
-from .prompt import summary_prompt_remote, qa_prompt_remote
+from .prompt import (
+    summary_prompt_remote,
+    qa_prompt_remote,
+    bullet_prompt_remote,
+    summary_params,
+    bullet_params,
+)
+from .sentence_breakdown import format_sentences_str
 from .timing import timing
 
 repo_url = "https://github.com/thomastay/cli-summarizer-llm/"
@@ -34,7 +41,12 @@ def summarize_openrouter(
         raise NotImplementedError
     elif args.type == "qa":
         system, user = qa_prompt_remote(text)
-    elif args.type == "summary_qa":
+    elif args.type == "bullet":
+        formatted_sentences = format_sentences_str(text)
+        # print(formatted_sentences)
+        system, user = bullet_prompt_remote(formatted_sentences)
+        prompt_params = bullet_params
+    elif args.type == "summaryplus":
         summarize_openrouter_multi(
             text,
             args,
@@ -44,6 +56,11 @@ def summarize_openrouter(
         return
     else:
         system, user = summary_prompt_remote(text)
+
+    if args.display_prompt:
+        print(f"<im_start>system{system}<im_end>\n")
+        print(f"<im_start>user{user}<im_end>\n")
+        print(f"<im_start>assistant\n")
     summary = openrouter_request(system, user, remote_args, prompt_params)
     print(summary)
 
@@ -87,12 +104,14 @@ def summarize_openrouter_multi(
     remote_args,
     prompt_params,
 ):
+    prompt_params = summary_params
     system, user = summary_prompt_remote(text)
     summary = openrouter_request(system, user, remote_args, prompt_params)
     if summary is None:
         return
     print(summary)
     print("=" * 80)
-    system, user = qa_prompt_remote(summary)
+    prompt_params = bullet_params
+    system, user = bullet_prompt_remote(text)
     qa = openrouter_request(system, user, remote_args, prompt_params)
     print(qa)
