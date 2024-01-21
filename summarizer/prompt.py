@@ -40,7 +40,9 @@ def bullet_prompt_remote(text):
         f'e.g. <m id=0>This is a sentence.</m> means that the sentence is "This is a sentence" and its id is 0\n'
         f"The sentence ids are 0-indexed and arranged in order of the text.\n"
         f"From the text, generate a list containing 3 highlights. Each highlight should be a single sentence and has 20 words or less. For each highlight, include one to four ids from the text that support the highlight, sorted by relevance to the highlight with most relevant first.\n"
-        f"Each highlight should be formatted as follows:\Highlight:Here is the highlight of the text.\nSupport: 1,5,13,14\n"
+        f"Each highlight should be formatted as follows:\n"
+        f"Highlight:Here is the highlight of the text.\nSupport: 1,5,13,14\n"
+        f"Highlight: Here is another the highlight of the text.\nSupport: 5, 34, 2\n"
     )
     user = f"===\n# TEXT\n===\n" f"{text}\n===\n{instruction}\n"
     return system_prompt, user
@@ -65,10 +67,10 @@ topic_params = {
 }
 bullet_params = {
     "num_out": 200,
-    "temperature": 0.3,
-    "top_k": 85,
-    "top_p": 0.99,
-    "repeat_penalty": 1.01,
+    "temperature": 0.7,
+    "top_k": 50,
+    "top_p": 1.0,
+    "repeat_penalty": 1.1,
     "min_p": 0,
     # "tfs": 0.68,
     # "typical_p": 0.68,

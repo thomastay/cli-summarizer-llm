@@ -10,4 +10,4 @@ def format_sentences(text):
 
 
 def format_sentences_str(text):
-    return "".join(format_sentence(i, sent) for i, sent in enumerate(nlp(text).sents))
+    return "\n".join(format_sentence(i, sent) for i, sent in enumerate(nlp(text).sents))

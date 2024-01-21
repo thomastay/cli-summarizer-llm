@@ -58,9 +58,10 @@ def summarize_openrouter(
         system, user = summary_prompt_remote(text)
 
     if args.display_prompt:
-        print(f"<im_start>system{system}<im_end>\n")
-        print(f"<im_start>user{user}<im_end>\n")
-        print(f"<im_start>assistant\n")
+        # print(f"<im_start>system{system}<im_end>\n")
+        # print(f"<im_start>user{user}<im_end>\n")
+        # print(f"<im_start>assistant\n")
+        print(f"{system}\n{user}\n")
     summary = openrouter_request(system, user, remote_args, prompt_params)
     print(summary)
 
