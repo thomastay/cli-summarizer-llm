@@ -2,7 +2,7 @@ from .text import nlp
 
 
 def format_sentence(i, sent):
-    return f"<m id={i}>{sent.text}</m>"
+    return f"<sentence id={i}>{sent.text}</sentence>"
 
 
 def format_sentences(text):
