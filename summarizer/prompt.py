@@ -18,7 +18,7 @@ def summary_prompt(text):
 
 def summary_prompt_remote(text):
     # Returns the system and user prompt separately
-    instruction = "Summarize the previous text in one or two paragraphs."
+    instruction = "Summarize the previous text in one paragraph. Create only one single summary and stop once you are done."
     user = f"{text}\n===\n{instruction}\n"
     return dolphin_prompt, user
 
@@ -28,7 +28,7 @@ def qa_prompt_remote(text):
     system_prompt = "You are a writer writing a question and answer session from a team of editors at a newspaper. You will be given a text and come up with questions and answers that they would ask."
     instruction = "Given the previous text, write three questions and answers that the readers would ask.\nWrite your questions and answers in the following format:\nQ: What is the question?\nA: This is the answer."
     user = f"{text}\n===\n{instruction}\n"
-    return dolphin_prompt, user
+    return system_prompt, user
 
 
 def topic_prompt(text):

@@ -30,15 +30,27 @@ def summarize_openrouter(
     Returns:
         None
     """
-    api_key = remote_args["api_key"]
-    model_name = remote_args["model_name"]
     if args.type == "topic":
         raise NotImplementedError
     elif args.type == "qa":
         system, user = qa_prompt_remote(text)
+    elif args.type == "summary_qa":
+        summarize_openrouter_multi(
+            text,
+            args,
+            remote_args,
+            prompt_params,
+        )
+        return
     else:
         system, user = summary_prompt_remote(text)
+    summary = openrouter_request(system, user, remote_args, prompt_params)
+    print(summary)
 
+
+def openrouter_request(system, user, remote_args, prompt_params):
+    api_key = remote_args["api_key"]
+    model_name = remote_args["model_name"]
     response = requests.post(
         url="https://openrouter.ai/api/v1/chat/completions",
         headers={
@@ -60,12 +72,27 @@ def summarize_openrouter(
             }
         ),
     )
-    # with open("out/response.json", "w") as f:
-    #     json.dump(response.json(), f, indent=4)
     data = response.json()
     try:
         summary = data["choices"][0]["message"]["content"]
-        print(summary, end="\n\n")
+        return summary
     except:
         with open("cli-summarizer-llm-response.json", "w") as f:
             json.dump(data, f, indent=4)
+
+
+def summarize_openrouter_multi(
+    text,
+    args,
+    remote_args,
+    prompt_params,
+):
+    system, user = summary_prompt_remote(text)
+    summary = openrouter_request(system, user, remote_args, prompt_params)
+    if summary is None:
+        return
+    print(summary)
+    print("=" * 80)
+    system, user = qa_prompt_remote(summary)
+    qa = openrouter_request(system, user, remote_args, prompt_params)
+    print(qa)
