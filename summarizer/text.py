@@ -11,6 +11,8 @@ nlp = spacy.load("en_core_web_sm")
 @timing
 def fetch_and_trim_text(url, args, trim_count):
     text = get_text(url, args)
+    if text is None or len(text) == 0:
+        raise Exception("Could not fetch text from url")
     text, noof_tokens = trim_text(text, args, max_tokens=trim_count)
     return text, noof_tokens
 
