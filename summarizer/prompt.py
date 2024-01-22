@@ -35,13 +35,13 @@ def bullet_prompt_remote(text):
     system_prompt = "You are a journalist writing a bullet point summary of a news article. You specialise in summarizing relevant information in clear, captivating and concise bullet points."
     instruction = (
         f"Text format:\n"
-        f"Each sentence is surrounded by a message tag s with an id attribute.\n"
-        f'e.g. <sentence id=0>This is a sentence.</sentence> means that the sentence is "This is a sentence" and its id is 0\n'
-        f"The sentence ids are 0-indexed and arranged in order of the text.\n"
+        f"Each sentence is labelled with an index\n"
+        f'e.g. 5. This is a sentence. Means that the sentence is "This is a sentence" and its id is 5\n'
+        f"The sentence ids are 1-indexed and arranged in order of the text.\n"
         f"From the text, generate a list containing 3 highlights. Each highlight should be a single sentence and has 20 words or less. For each highlight, include one to four ids from the text that support the highlight, sorted by relevance to the highlight with most relevant first.\n"
         f"Each highlight should be formatted as follows:\n"
         f"Highlight:Here is the highlight of the text.\nSupport: 1,5,13,14\n"
-        f"Highlight: Here is another the highlight of the text.\nSupport: 5, 34, 2\n"
+        f"Highlight: Here is another the highlight of the text.\nSupport: 5, 34, 2"
     )
     user = f"===\n# TEXT\n===\n" f"{text}\n===\n{instruction}\n"
     return system_prompt, user

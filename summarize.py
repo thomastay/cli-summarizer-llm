@@ -33,6 +33,11 @@ parser.add_argument(
 )
 parser.add_argument("--type", help="Prompt type")
 parser.add_argument("--remote", action="store_true", help="Use remote summarizer")
+parser.add_argument(
+    "--no-generate",
+    action="store_true",
+    help="Don't generate a response. Use this in conjunction with --display-prompt to see the prompt.",
+)
 
 args = parser.parse_args()
 
@@ -75,7 +80,8 @@ eta = (
     + prompt_params["num_out"] / token_generation_speed
 )
 
-print(f"Num tokens: {noof_tokens} eta: {eta:.2f} seconds")
+if args.verbose:
+    print(f"Num tokens: {noof_tokens} eta: {eta:.2f} seconds")
 # For debugging middle
 if args.display_middle:
     middle = trim_middle(text)

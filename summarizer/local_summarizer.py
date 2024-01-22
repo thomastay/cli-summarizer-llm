@@ -75,6 +75,9 @@ def summarize_local(
         subprocess_args.append("--no-display-prompt")
 
     curr_time = time()
+    if args.no_generate:
+        print(prompt)
+        return
 
     if args.verbose:
         subprocess.run(subprocess_args)

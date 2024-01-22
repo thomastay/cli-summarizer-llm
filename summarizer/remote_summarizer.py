@@ -1,5 +1,6 @@
 import requests
 import json
+import concurrent.futures
 
 from .prompt import (
     summary_prompt_remote,
@@ -45,7 +46,6 @@ def summarize_openrouter(
         system, user = qa_prompt_remote(text)
     elif args.type == "bullet":
         formatted_sentences = format_sentences_str(text)
-        # print(formatted_sentences)
         system, user = bullet_prompt_remote(formatted_sentences)
         prompt_params = bullet_params
     elif args.type == "summaryplus":
@@ -64,6 +64,8 @@ def summarize_openrouter(
         # print(f"<im_start>user{user}<im_end>\n")
         # print(f"<im_start>assistant\n")
         print(f"{system}\n{user}\n")
+    if args.no_generate:
+        return
     summary = openrouter_request(system, user, remote_args, prompt_params)
     print(summary)
 
@@ -107,16 +109,29 @@ def summarize_openrouter_multi(
     remote_args,
     prompt_params,
 ):
-    prompt_params = summary_params
-    system, user = summary_prompt_remote(text)
-    summary = openrouter_request(system, user, remote_args, prompt_params)
-    if summary is None:
-        return
-    print(summary)
-
-    print("=" * 80)
-
-    prompt_params = topic_params
-    system, user = topic_prompt_remote(text)
-    topics = openrouter_request(system, user, remote_args, prompt_params)
-    print(topics)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        prompt_params = summary_params
+        system, user = summary_prompt_remote(text)
+        summary_fut = executor.submit(
+            openrouter_request,
+            system,
+            user,
+            remote_args,
+            prompt_params,
+        )
+        prompt_params = topic_params
+        system, user = topic_prompt_remote(text)
+        topics_fut = executor.submit(
+            openrouter_request,
+            system,
+            user,
+            remote_args,
+            prompt_params,
+        )
+        futs = [summary_fut, topics_fut]
+        concurrent.futures.wait(futs)
+        summary = summary_fut.result()
+        print(summary)
+        topics = topics_fut.result()
+        print("=" * 80)
+        print(topics)

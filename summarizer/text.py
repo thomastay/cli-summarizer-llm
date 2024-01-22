@@ -11,7 +11,7 @@ nlp = spacy.load("en_core_web_sm")
 @timing
 def fetch_and_trim_text(url, args, trim_count):
     text = get_text(url, args)
-    text, noof_tokens = trim_text(text, trim_count)
+    text, noof_tokens = trim_text(text, args, max_tokens=trim_count)
     return text, noof_tokens
 
 
@@ -33,7 +33,7 @@ def num_tokens(text):
     return len(tokenizer(text, verbose=False)["input_ids"])
 
 
-def trim_text(text, max_tokens=3700):
+def trim_text(text, args, max_tokens=3700):
     total_tokens = num_tokens(text)
     if total_tokens < max_tokens:
         return text, total_tokens
@@ -63,13 +63,14 @@ def trim_text(text, max_tokens=3700):
         sentences_end.append(sentence)
     sentences_end.reverse()
     return_text = " ".join(sentences + sentences_end)
-    print(
-        "Num tokens:",
-        total_tokens,
-        "Trimmed:",
-        curr_tokens,
-        f"({round(curr_tokens / total_tokens * 100)}%)",
-    )
+    if args.verbose:
+        print(
+            "Num tokens:",
+            total_tokens,
+            "Trimmed:",
+            curr_tokens,
+            f"({round(curr_tokens / total_tokens * 100)}%)",
+        )
     return return_text, curr_tokens
 
 
