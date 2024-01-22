@@ -32,7 +32,6 @@ def qa_prompt_remote(text):
 
 
 def bullet_prompt_remote(text):
-    # Returns the system and user prompt separately
     system_prompt = "You are a journalist writing a bullet point summary of a news article. You specialise in summarizing relevant information in clear, captivating and concise bullet points."
     instruction = (
         f"Text format:\n"
@@ -53,7 +52,14 @@ def topic_prompt(text):
     return create_prompt_base(text, instruction, system_prompt=dolphin_topic_prompt)
 
 
-num_toks_per_topic = 20
+def topic_prompt_remote(text):
+    system_prompt = "You are a journalist writing a bullet point summary of a news article. You specialise in summarizing relevant information in clear, captivating and concise bullet points."
+    instruction = f"From the text, generate a list containing 5 highlights. Each highlight should be a single sentence and has 20 words or less.\n"
+    user = f"===\n# TEXT\n===\n" f"{text}\n===\n{instruction}\n"
+    return system_prompt, user
+
+
+num_toks_per_topic = 70
 num_topics = 5
 topic_params = {
     "num_out": num_toks_per_topic * num_topics,

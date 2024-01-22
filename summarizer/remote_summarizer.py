@@ -5,8 +5,10 @@ from .prompt import (
     summary_prompt_remote,
     qa_prompt_remote,
     bullet_prompt_remote,
+    topic_prompt_remote,
     summary_params,
     bullet_params,
+    topic_params,
 )
 from .sentence_breakdown import format_sentences_str
 from .timing import timing
@@ -38,7 +40,7 @@ def summarize_openrouter(
         None
     """
     if args.type == "topic":
-        raise NotImplementedError
+        system, user = topic_prompt_remote(text)
     elif args.type == "qa":
         system, user = qa_prompt_remote(text)
     elif args.type == "bullet":
@@ -111,8 +113,10 @@ def summarize_openrouter_multi(
     if summary is None:
         return
     print(summary)
+
     print("=" * 80)
-    prompt_params = bullet_params
-    system, user = bullet_prompt_remote(text)
-    qa = openrouter_request(system, user, remote_args, prompt_params)
-    print(qa)
+
+    prompt_params = topic_params
+    system, user = topic_prompt_remote(text)
+    topics = openrouter_request(system, user, remote_args, prompt_params)
+    print(topics)
