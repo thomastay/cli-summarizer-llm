@@ -9,6 +9,7 @@ from summarizer.text import (
 from summarizer.prompt import summary_prompt, topic_prompt, topic_params, summary_params
 from summarizer.local_summarizer import summarize_local
 from summarizer.remote_summarizer import summarize_openrouter
+from summarizer.openai_summarizer import summarize_openai
 
 parser = argparse.ArgumentParser(
     prog="cli-summarizer",
@@ -32,7 +33,9 @@ parser.add_argument(
     help="Include tables in the prompt (usually not helpful for summaries)",
 )
 parser.add_argument("--type", help="Prompt type")
-parser.add_argument("--remote", action="store_true", help="Use remote summarizer")
+parser.add_argument(
+    "--remote", choices=["openai", "openrouter"], help="Use remote summarizer"
+)
 parser.add_argument(
     "--no-generate",
     action="store_true",
@@ -47,16 +50,7 @@ else:
     prompt_params = summary_params
 
 # Model specific details
-if args.remote:
-    # TODO make this generic
-    model_name = "nousresearch/nous-capybara-7b:free"
-    model_context = 4096
-    max_scale_context = 1
-    prompt_processing_speed = (
-        10000  # tokens per second. R deems this not statistically significant, lol
-    )
-    token_generation_speed = 60  # tokens per second
-else:
+if args.remote is None:
     model_name = "dolphin-2_6-phi-2"
     model_path = (
         "/Users/thomastay/text-generation-webui/models/dolphin-2_6-phi-2.Q4_K_M.gguf"
@@ -65,6 +59,15 @@ else:
     max_scale_context = 4
     prompt_processing_speed = 80  # tokens per second
     token_generation_speed = 15  # tokens per second
+else:
+    # TODO make this generic
+    model_name = "nousresearch/nous-capybara-7b:free"
+    model_context = 4096
+    max_scale_context = 1
+    prompt_processing_speed = (
+        10000  # tokens per second. R deems this not statistically significant, lol
+    )
+    token_generation_speed = 60  # tokens per second
 
 
 # calculated offline
@@ -99,7 +102,7 @@ if args.type == "topic":
 else:
     prompt = summary_prompt(text)
 
-if args.remote:
+if args.remote == "openrouter":
     api_key = os.environ.get("OPEN_API_KEY")
     summarize_openrouter(
         text,
@@ -107,6 +110,17 @@ if args.remote:
         remote_args={
             "api_key": api_key,
             "model_name": model_name,  # it's free for now
+        },
+        prompt_params=prompt_params,
+    )
+elif args.remote == "openai":
+    api_key = os.environ.get("OPENAI_API_KEY")
+    summarize_openai(
+        text,
+        args,
+        remote_args={
+            "api_key": api_key,
+            "model_name": model_name,
         },
         prompt_params=prompt_params,
     )
