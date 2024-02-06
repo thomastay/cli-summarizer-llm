@@ -7,9 +7,11 @@ from .prompt import (
     qa_prompt_remote,
     bullet_prompt_remote,
     topic_prompt_remote,
+    cod_prompt,
     summary_params,
     bullet_params,
     topic_params,
+    cod_params,
 )
 from .sentence_breakdown import format_sentences_str
 from .timing import timing
@@ -48,6 +50,9 @@ def summarize_openrouter(
         formatted_sentences = format_sentences_str(text)
         system, user = bullet_prompt_remote(formatted_sentences)
         prompt_params = bullet_params
+    elif args.type == "cod":
+        system, user = cod_prompt(text)
+        prompt_params = cod_params
     elif args.type == "summaryplus":
         summarize_openrouter_multi(
             text,
@@ -89,8 +94,8 @@ def openrouter_request(system, user, remote_args, prompt_params):
                 ],
                 "max_tokens": prompt_params["num_out"],
                 "temperature": prompt_params["temperature"],
-                "top_p": prompt_params["top_p"],
-                "top_k": prompt_params["top_k"],
+                # "top_p": prompt_params["top_p"],
+                # "top_k": prompt_params["top_k"],
             }
         ),
     )

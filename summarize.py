@@ -49,7 +49,7 @@ else:
 # Model specific details
 if args.remote:
     # TODO make this generic
-    model_name = "nousresearch/nous-capybara-7b"
+    model_name = "nousresearch/nous-capybara-7b:free"
     model_context = 4096
     max_scale_context = 1
     prompt_processing_speed = (
@@ -68,7 +68,10 @@ else:
 
 
 # calculated offline
-prompt_size = 160
+if args.type == "cod":
+    prompt_size = 350
+else:
+    prompt_size = 160
 url = args.url
 trim_count = (
     max_scale_context * model_context - prompt_params["num_out"] - prompt_size
