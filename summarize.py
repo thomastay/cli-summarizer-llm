@@ -80,8 +80,13 @@ elif args.remote == "openai":
         10000  # tokens per second. R deems this not statistically significant, lol
     )
     token_generation_speed = 60  # tokens per second
-    input_price = 0.5  # Price per million tokens
-    output_price = 1.5
+    if args.type == "cod":
+        # use gpt4 pricing
+        input_price = 10  # Price per million tokens
+        output_price = 30
+    else:
+        input_price = 0.5  # Price per million tokens
+        output_price = 1.5
 
 
 # calculated offline

@@ -143,7 +143,7 @@ summary_params = {
     "min_p": 0.0,
 }
 cod_params = {
-    "num_out": 1024,
+    "num_out": 1234,
     "temperature": 1.0,
     "top_k": 80,
     "top_p": 1.0,

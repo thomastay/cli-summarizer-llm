@@ -54,7 +54,7 @@ def summarize_openai(
     response_format = {"type": "json_object"} if is_json else None
     stream = client.chat.completions.create(
         model=model,
-        response_format=response_format,
+        # response_format=response_format,
         messages=messages,
         max_tokens=prompt_params["num_out"],
         temperature=prompt_params["temperature"],
