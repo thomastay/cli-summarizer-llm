@@ -59,10 +59,18 @@ if args.remote is None:
     max_scale_context = 4
     prompt_processing_speed = 80  # tokens per second
     token_generation_speed = 15  # tokens per second
-else:
+elif args.remote == "openrouter":
     # TODO make this generic
     model_name = "nousresearch/nous-capybara-7b:free"
     model_context = 4096
+    max_scale_context = 1
+    prompt_processing_speed = (
+        10000  # tokens per second. R deems this not statistically significant, lol
+    )
+    token_generation_speed = 60  # tokens per second
+elif args.remote == "openai":
+    model_name = "gpt-3.5-turbo-0125"
+    model_context = 16384
     max_scale_context = 1
     prompt_processing_speed = (
         10000  # tokens per second. R deems this not statistically significant, lol
