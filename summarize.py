@@ -59,6 +59,8 @@ if args.remote is None:
     max_scale_context = 4
     prompt_processing_speed = 80  # tokens per second
     token_generation_speed = 15  # tokens per second
+    input_price = 0
+    output_price = 0
 elif args.remote == "openrouter":
     # TODO make this generic
     model_name = "nousresearch/nous-capybara-7b:free"
@@ -68,6 +70,8 @@ elif args.remote == "openrouter":
         10000  # tokens per second. R deems this not statistically significant, lol
     )
     token_generation_speed = 60  # tokens per second
+    input_price = 0
+    output_price = 0
 elif args.remote == "openai":
     model_name = "gpt-3.5-turbo-0125"
     model_context = 16384
@@ -76,6 +80,8 @@ elif args.remote == "openai":
         10000  # tokens per second. R deems this not statistically significant, lol
     )
     token_generation_speed = 60  # tokens per second
+    input_price = 0.5  # Price per million tokens
+    output_price = 1.5
 
 
 # calculated offline
@@ -93,9 +99,13 @@ eta = (
     noof_tokens / prompt_processing_speed
     + prompt_params["num_out"] / token_generation_speed
 )
+price = (noof_tokens * input_price + prompt_params["num_out"] * output_price) / 1e6
 
 if args.verbose:
-    print(f"Num tokens: {noof_tokens} eta: {eta:.2f} seconds")
+    if args.remote == "openai":
+        print(f"Num tokens: {noof_tokens}, cost ${price:.4f}")
+    else:
+        print(f"Num tokens: {noof_tokens} eta: {eta:.2f} seconds")
 # For debugging middle
 if args.display_middle:
     middle = trim_middle(text)

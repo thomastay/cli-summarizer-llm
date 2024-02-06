@@ -64,7 +64,7 @@ def summary_prompt(text):
 def summary_prompt_remote(text):
     # Returns the system and user prompt separately
     instruction = "Summarize the previous text in one paragraph. Include as many topics as possible, make every word count. Create only one single summary and stop once you are done."
-    user = f"{text}\n===\n{instruction}\n"
+    user = f"===\n# Article\n\n{text}\n===\n{instruction}\n"
     return dolphin_prompt, user
 
 

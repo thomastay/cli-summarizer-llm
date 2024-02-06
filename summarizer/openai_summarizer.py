@@ -23,7 +23,10 @@ def summarize_openai(
     remote_args,  # Args relating to remote
     prompt_params,
 ):
+    # Defaults
+    model = "gpt-3.5-turbo-0125"
     is_json = False
+
     if args.type == "topic":
         system, user = topic_prompt_remote(text)
     elif args.type == "qa":
@@ -33,6 +36,7 @@ def summarize_openai(
     elif args.type == "cod":
         system, user = cod_prompt(text)
         is_json = True
+        model = "gpt-4-0125-preview"
         prompt_params = cod_params
     else:
         system, user = summary_prompt_remote(text)
@@ -47,7 +51,6 @@ def summarize_openai(
         {"role": "system", "content": system},
         {"role": "user", "content": user},
     ]
-    model = "gpt-3.5-turbo-0125"
     response_format = {"type": "json_object"} if is_json else None
     stream = client.chat.completions.create(
         model=model,
