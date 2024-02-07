@@ -1,16 +1,7 @@
 import gradio as gr
-from dataclasses import dataclass
 from summarizer.text import get_text
 from summarizer.openai_summarizer import questions_from_title, summarize_openai
-
-
-@dataclass
-class Args:
-    type: str
-    display_prompt: bool
-    no_generate: bool
-    include_code: bool
-    include_tables: bool
+from summarizer.args import Args
 
 
 def summarize(title, url):
