@@ -9,7 +9,7 @@ from summarizer.text import (
 from summarizer.prompt import summary_prompt, topic_prompt, topic_params, summary_params
 from summarizer.local_summarizer import summarize_local
 from summarizer.remote_summarizer import summarize_openrouter
-from summarizer.openai_summarizer import summarize_openai
+from summarizer.openai_summarizer import summarize_openai_cli
 
 parser = argparse.ArgumentParser(
     prog="cli-summarizer",
@@ -138,14 +138,9 @@ if args.remote == "openrouter":
     )
 elif args.remote == "openai":
     api_key = os.environ.get("OPENAI_API_KEY")
-    summarize_openai(
+    summarize_openai_cli(
         text,
         args,
-        remote_args={
-            "api_key": api_key,
-            "model_name": model_name,
-        },
-        prompt_params=prompt_params,
     )
 else:
     local_args = {
