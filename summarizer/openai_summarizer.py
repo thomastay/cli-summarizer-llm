@@ -29,7 +29,6 @@ def questions_from_title(title):
         temperature=title_params["temperature"],
         is_json=True,
     )
-    print(questions)
     questions_json = json.loads(questions)
     questions_arr = questions_json["questions"]
     return questions_arr

@@ -1,29 +1,36 @@
+import time
 import gradio as gr
-from summarizer.text import get_text
+from summarizer.text import get_text_and_title
 from summarizer.openai_summarizer import questions_from_title, summarize_openai
-from summarizer.args import Args
+from summarizer.database import save_to_db
 
 
-def summarize(title, url):
-    args = Args(
-        type="summary",
-        display_prompt=False,
-        no_generate=False,
-        include_code=False,
-        include_tables=False,
-    )
+def summarize(url):
+    title, text = get_text_and_title(url)
     questions = questions_from_title(title)
-    text = get_text(url, args)
-    yield from summarize_openai(
+
+    final_output = ""
+    for partial_out in summarize_openai(
         text,
         questions,
-    )
+    ):
+        final_output = partial_out
+        yield partial_out
+    key = url
+    value = {
+        "title": title,
+        "text": text,
+        "questions": questions,
+        "summary": final_output,
+        "created_at": round(time.time()),
+    }
+    save_to_db(key, value)
 
 
 # Define the Gradio interface
 demo = gr.Interface(
     fn=summarize,  # The function to call
-    inputs=["text", "text"],  # The input component
+    inputs=["text"],  # The input component
     outputs=["text"],  # The output component
 )
 
